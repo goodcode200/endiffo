@@ -6,58 +6,8 @@ using System.Text;
 
 namespace endiffo
 {
-    public struct Constants
+    static class Program
     {
-        public const string HOSTS_FILE = "/etc/hosts";
-        public const string ENVIRON_VAR_COMMAND = "printenv";
-        public const string DEFAULT_SNAPSHOT_FILE = "snapshot.endiffo";
-    }
-
-    public struct SystemSnapshot
-    {
-        // Environment variables.
-        [JsonProperty]
-        public readonly string EnvBase64;
-
-        // Contents of HOSTS_FILE.
-        [JsonProperty]
-        public readonly string HostsBase64;
-
-        public SystemSnapshot(string envBase64, string hostsBase64)
-        {
-            EnvBase64 = envBase64;
-            HostsBase64 = hostsBase64;
-        }
-    };
-
-    class Program
-    {
-        // Reference: https://stackoverflow.com/questions/11743160/how-do-i-encode-and-decode-a-base64-string
-        static string EncodeToBase64(string unencoded)
-        {
-            return Convert.ToBase64String(Encoding.UTF8.GetBytes(unencoded));
-        }
-
-        // static string ExecViaBash()
-        // {
-        //     var process = new Process()
-        //     {
-        //         StartInfo = new ProcessStartInfo
-        //         {
-        //             FileName = "/bin/bash",
-        //             Arguments = "-c \"printenv\"",
-        //             RedirectStandardOutput = true,
-        //             UseShellExecute = false,
-        //             CreateNoWindow = true,
-        //         }
-        //     };
-
-        //     process.Start();
-        //     string result = process.StandardOutput.ReadToEnd();
-        //     process.WaitForExit();
-        //     return result;
-        // }
-
         // Returns null in case of an error.
         // Written to work on Windows and Linux
         // Note that this is an insecure way to run an application. An alternative is discussed here:
@@ -95,8 +45,8 @@ namespace endiffo
             try
             {
                 var snapshot = new SystemSnapshot (
-                    envBase64: EncodeToBase64(PrintEnv()),
-                    hostsBase64: EncodeToBase64(GetHosts())
+                    envBase64: Utility.EncodeToBase64(PrintEnv()),
+                    hostsBase64: Utility.EncodeToBase64(GetHosts())
                 );
 
                 File.WriteAllText(
