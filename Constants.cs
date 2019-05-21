@@ -8,5 +8,6 @@ namespace endiffo
         public const string DEFAULT_SNAPSHOT_FILENAME_BASE = "snapshot_";
         public const string DEFAULT_SNAPSHOT_EXTENSION = "endiffo";
         public const string DATETIME_FORMAT = "yyyy-MM-ddTHH:mm:ssZ";
+        public const string OUTPUT_CMDLINE_FLAG = "-o |--output";
     }
 }

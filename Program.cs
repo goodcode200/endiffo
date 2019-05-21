@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.CommandLineUtils;
+using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -41,25 +42,53 @@ namespace endiffo
             return File.ReadAllText(Constants.HOSTS_FILE);
         }
 
+        // Command line parsing: https://gstoob-online.netlify.com/posts/parsing-command-line-arguments
         static void Main(string[] args)
         {
-            // Reference: https://mariusschulz.com/blog/detecting-the-operating-system-in-net-core
-            // if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            // {
-            //     Console.WriteLine("Platform is Windows.");
-            // }
-
             try
             {
-                var snapshot = new SystemSnapshot (
-                    envBase64: Utility.EncodeToBase64(PrintEnv()),
-                    hostsBase64: Utility.EncodeToBase64(GetHosts())
-                );
+                var app = new CommandLineApplication();
 
-                File.WriteAllText(
-                    Utility.GetSnapshotFileName(),
-                    JsonConvert.SerializeObject(snapshot)
-                );
+                var outputOption = app.Option(
+                    Constants.OUTPUT_CMDLINE_FLAG,
+                    "Determines the file to save a snapshot to.",
+                    CommandOptionType.SingleValue);
+                
+                app.OnExecute(() =>
+                {
+                    string outputPath = outputOption.HasValue()
+                        ? outputOption.Value()
+                        : Utility.GetSnapshotFileName();
+
+                    // Reference: https://stackoverflow.com/questions/4650462/easiest-way-to-check-if-an-arbitrary-string-is-a-valid-filename
+                    if (string.IsNullOrWhiteSpace(outputPath)
+                        || outputPath.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
+                        throw new ArgumentException("Invalid output path.");
+
+                    if (File.Exists(outputPath))
+                        throw new ArgumentException("Output path already exists.");
+
+                    string directory = new FileInfo(outputPath).Directory.FullName;
+                    if (string.IsNullOrWhiteSpace(directory))
+                        throw new ArgumentException("Invalid output path.");
+
+                    if (!Directory.Exists(directory))
+                        Directory.CreateDirectory(directory);
+
+                    var snapshot = new SystemSnapshot (
+                        envBase64: Utility.EncodeToBase64(PrintEnv()),
+                        hostsBase64: Utility.EncodeToBase64(GetHosts())
+                    );
+
+                    File.WriteAllText(
+                        outputPath,
+                        JsonConvert.SerializeObject(snapshot)
+                    );
+
+                    return 0;
+                });
+
+                app.Execute(args);                
             }
             catch(Exception ex)
             {
@@ -67,9 +96,15 @@ namespace endiffo
                     "An error occurred and the application had to terminate." + Environment.NewLine
                     + "Error text: " + ex.Message + Environment.NewLine
                     + "Inner exception: " + ex.InnerException + Environment.NewLine
-                    + "Stack trace: " + ex.StackTrace
+                    + "Stack trace: " + Environment.NewLine + ex.StackTrace
                 );
             }
         }
     }
 }
+
+// Reference: https://mariusschulz.com/blog/detecting-the-operating-system-in-net-core
+// if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+// {
+//     Console.WriteLine("Platform is Windows.");
+// }
