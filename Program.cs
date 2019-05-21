@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace endiffo
@@ -42,6 +43,12 @@ namespace endiffo
 
         static void Main(string[] args)
         {
+            // Reference: https://mariusschulz.com/blog/detecting-the-operating-system-in-net-core
+            // if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            // {
+            //     Console.WriteLine("Platform is Windows.");
+            // }
+
             try
             {
                 var snapshot = new SystemSnapshot (
