@@ -50,7 +50,7 @@ namespace endiffo
                 );
 
                 File.WriteAllText(
-                    Constants.DEFAULT_SNAPSHOT_FILE,
+                    Utility.GetSnapshotFileName(),
                     JsonConvert.SerializeObject(snapshot)
                 );
             }

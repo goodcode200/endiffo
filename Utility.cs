@@ -10,5 +10,14 @@ namespace endiffo
         {
             return Convert.ToBase64String(Encoding.UTF8.GetBytes(unencoded));
         }
+
+        public static string GetSnapshotFileName()
+        {
+            return
+                Constants.DEFAULT_SNAPSHOT_FILENAME_BASE
+                + DateTime.UtcNow.ToString(Constants.DATETIME_FORMAT)
+                + "."
+                + Constants.DEFAULT_SNAPSHOT_EXTENSION;
+        }
     };
 }
