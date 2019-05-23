@@ -95,7 +95,7 @@ namespace endiffo
                 Console.WriteLine (
                     "An error occurred and the application had to terminate." + Environment.NewLine
                     + "Error text: " + ex.Message + Environment.NewLine
-                    + "Inner exception: " + ex.InnerException + Environment.NewLine
+                    //+ "Inner exception: " + ex.InnerException + Environment.NewLine
                     + "Stack trace: " + Environment.NewLine + ex.StackTrace
                 );
             }

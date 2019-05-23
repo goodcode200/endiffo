@@ -1,7 +1,14 @@
-# endiffo
-Endiffo is an environment comparison tool for Linux and Windows. It should make it easier to spot that one difference between dev and test, or compare your settings now to those you had 5 days ago. It works by making a snapshot of common and user-specified locations where configuration is stored, for example your environment variables and hosts file. The information can be stored long-term and/or transferred between systems for comparison.
+# endiffo - Environment Diff Tool
+Endiffo is an environment comparison tool. It will allow you to:
+- Record a subset of the system state, focusing on commonly-used locations where configuration is kept as well as user-specified locations.
+- Compare snapshots to discover differences
+- Apply snapshots (providing a summary of changes to be made and a big warning before continuing)
+
+It may also prove useful to run the application in VMs, Docker containers, at different times on the same machine or between dev and test environments:
 
 It will be possible to make the file as small or comprehensive as required, and perform a diff between saved snapshots.
 
+Endiffo runs on both Windows and Linux.
+
 # Command Line Arguments
--o	Specify output filename. By default this is “snapshot_DATETIME.endiffo”, where DATETIME is an ISO 8601-formatted date.
+-o --output Specify output filename. By default this is “snapshot_DATETIME.endiffo”, where DATETIME is an ISO 8601-formatted date.
