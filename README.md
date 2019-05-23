@@ -10,5 +10,13 @@ It will be possible to make the file as small or comprehensive as required, and 
 
 Endiffo runs on both Windows and Linux.
 
+# Configuration Locations
+Locations checked by Endiffo by default will include:
+- System information
+- /etc/hosts
+- Environment variables (via printenv)
+
+The user can also add registry keys (if on Windows) and folders which will then be included in snapshots and diffs.
+
 # Command Line Arguments
--o --output Specify output filename. By default this is “snapshot_DATETIME.endiffo”, where DATETIME is an ISO 8601-formatted date.
+`-o --output     Specify output filename. By default this is “snapshot_DATETIME.endiffo”, where DATETIME is an ISO 8601-formatted date.`
