@@ -39,7 +39,11 @@ namespace endiffo
         // in which case this function signature will change.
         static string GetHosts()
         {
-            return File.ReadAllText(Constants.HOSTS_FILE);
+            return File.ReadAllText (
+                RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    ? Constants.WINDOWS_HOSTS_FILE
+                    : Constants.HOSTS_FILE
+            );
         }
 
         // Command line parsing: https://gstoob-online.netlify.com/posts/parsing-command-line-arguments
@@ -102,9 +106,3 @@ namespace endiffo
         }
     }
 }
-
-// Reference: https://mariusschulz.com/blog/detecting-the-operating-system-in-net-core
-// if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-// {
-//     Console.WriteLine("Platform is Windows.");
-// }
