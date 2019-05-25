@@ -51,6 +51,11 @@ namespace endiffo
         {
             try
             {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    RegistryHandler.GetKeys();
+                }
+
                 var app = new CommandLineApplication();
 
                 var outputOption = app.Option(
