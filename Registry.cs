@@ -7,10 +7,12 @@ using System.Collections.Generic;
 
 namespace endiffo
 {
-    // Reference: https://docs.microsoft.com/en-us/dotnet/api/microsoft.win32.registry?view=netframework-4.8
-    // Exceptions NOT to throw: https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/using-standard-exception-types
+    /// Reference: https://docs.microsoft.com/en-us/dotnet/api/microsoft.win32.registry?view=netframework-4.8
+    /// Exceptions NOT to throw: https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/using-standard-exception-types
     public static class RegistryHandler
     {
+        /// At the moment this is an example method for how to read data from the registry.
+        /// It saves collected data in the given file.
         public static void GetKeys(string filename)
         {
             #if !OS_Windows

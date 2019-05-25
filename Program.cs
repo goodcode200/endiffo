@@ -11,8 +11,8 @@ namespace endiffo
 {
     static class Program
     {
-        // The printenv command should work on both Windows and Linux.
-        // If there are any errors this function can return null.
+        /// Get a string containing the exact output of the printenv command.
+        /// This so far seems to work the exact same way on Windows and Linux.
         static string PrintEnv()
         {
             var process = new Process()
@@ -29,11 +29,12 @@ namespace endiffo
             process.Start();
             string result = process.StandardOutput.ReadToEnd();
 
-            // TODO The application could potentially freeze here.
+            // TODO The application could potentially freeze anywhere it executes an external command.
             process.WaitForExit();
             return result;
         }
 
+        /// Start a command-line application which saves a snapshot of the system in a zip file.
         static void Main(string[] args)
         {
             try
@@ -47,14 +48,16 @@ namespace endiffo
                 
                 app.OnExecute(() =>
                 {
-                    string endiffoTempPath = Path.Join(Utility.GetTempFolder(), ".endiffo/");
+                    string endiffoTempPath = Path.Join(Utility.GetTempFolder(), ".endiffo");
 
-                    if (!Directory.Exists(endiffoTempPath))
+                    if (Directory.Exists(endiffoTempPath))
+                        Utility.CleanDirectory(endiffoTempPath);
+                    else
                         Directory.CreateDirectory(endiffoTempPath);
 
                     // Todo: Use streamWriter
                     File.WriteAllText(Path.Join(endiffoTempPath, "printenv"), PrintEnv());
-                    File.Copy(Utility.GetHostsFilename(), Path.Join(endiffoTempPath, "hosts"));
+                    File.Copy(Utility.GetHostsFilePath(), Path.Join(endiffoTempPath, "hosts"));
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                         RegistryHandler.GetKeys(Path.Join(endiffoTempPath, "registry.txt"));
 
@@ -67,6 +70,8 @@ namespace endiffo
                         throw new ArgumentException("Invalid output path.");
 
                     ZipFile.CreateFromDirectory(endiffoTempPath, outputPath);
+
+                    Utility.CleanDirectory(endiffoTempPath);
 
                     return 0;
                 });

@@ -20,7 +20,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
-    <PackageReference Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'" Include="Microsoft.Win32.Registry" Version="4.5.0" />
+    <PackageReference Condition="'$(IsWindows)'=='true'" Include="Microsoft.Win32.Registry" Version="4.5.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
 
