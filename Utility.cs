@@ -1,11 +1,12 @@
 using System;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace endiffo
 {
     public static class Utility
     {
-        // Reference: https://stackoverflow.com/questions/11743160/how-do-i-encode-and-decode-a-base64-string
         public static string EncodeToBase64(string unencoded)
         {
             return Convert.ToBase64String(Encoding.UTF8.GetBytes(unencoded));
@@ -18,6 +19,28 @@ namespace endiffo
                 + DateTime.UtcNow.ToString(Constants.DATETIME_FORMAT)
                 + "."
                 + Constants.DEFAULT_SNAPSHOT_EXTENSION;
+        }
+
+        public static string GetTempFolder()
+        {
+            return 
+                RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? "%temp%/"
+                : "/tmp/";
+        }
+
+        // TODO If the hosts file is unexpectedly large, we might want to consider streaming it,
+        // in which case this function signature will change.
+        public static string GetHosts()
+        {
+            return File.ReadAllText(GetHostsFilename());
+        }
+
+        public static string GetHostsFilename()
+        {
+            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                ? Constants.WINDOWS_HOSTS_FILE
+                : Constants.HOSTS_FILE;
         }
     };
 }
