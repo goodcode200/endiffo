@@ -25,7 +25,7 @@ namespace endiffo
         {
             return 
                 RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? "%temp%/"
+                ? Path.GetTempPath()
                 : "/tmp/";
         }
 
