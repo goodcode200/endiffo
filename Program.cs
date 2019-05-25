@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -10,10 +11,8 @@ namespace endiffo
 {
     static class Program
     {
-        // Returns null in case of an error.
-        // Written to work on Windows and Linux
-        // Note that this is an insecure way to run an application. An alternative is discussed here:
-        // https://stackoverflow.com/questions/48296629/launch-external-process-exe-from-asp-net-core-app
+        // The printenv command should work on both Windows and Linux.
+        // If there are any errors this function can return null.
         static string PrintEnv()
         {
             var process = new Process()
@@ -35,27 +34,10 @@ namespace endiffo
             return result;
         }
 
-        // TODO If the hosts file is unexpectedly large, we might want to consider streaming it,
-        // in which case this function signature will change.
-        static string GetHosts()
-        {
-            return File.ReadAllText (
-                RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                    ? Constants.WINDOWS_HOSTS_FILE
-                    : Constants.HOSTS_FILE
-            );
-        }
-
-        // Command line parsing: https://gstoob-online.netlify.com/posts/parsing-command-line-arguments
         static void Main(string[] args)
         {
             try
             {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                {
-                    RegistryHandler.GetKeys();
-                }
-
                 var app = new CommandLineApplication();
 
                 var outputOption = app.Option(
@@ -65,34 +47,26 @@ namespace endiffo
                 
                 app.OnExecute(() =>
                 {
+                    string endiffoTempPath = Path.Join(Utility.GetTempFolder(), ".endiffo/");
+
+                    if (!Directory.Exists(endiffoTempPath))
+                        Directory.CreateDirectory(endiffoTempPath);
+
+                    // Todo: Use streamWriter
+                    File.WriteAllText(Path.Join(endiffoTempPath, "printenv"), PrintEnv());
+                    File.Copy(Utility.GetHostsFilename(), Path.Join(endiffoTempPath, "hosts"));
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        RegistryHandler.GetKeys(Path.Join(endiffoTempPath, "registry.txt"));
+
                     string outputPath = outputOption.HasValue()
                         ? outputOption.Value()
                         : Utility.GetSnapshotFileName();
 
-                    // Reference: https://stackoverflow.com/questions/4650462/easiest-way-to-check-if-an-arbitrary-string-is-a-valid-filename
                     if (string.IsNullOrWhiteSpace(outputPath)
                         || outputPath.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
                         throw new ArgumentException("Invalid output path.");
 
-                    if (File.Exists(outputPath))
-                        throw new ArgumentException("Output path already exists.");
-
-                    string directory = new FileInfo(outputPath).Directory.FullName;
-                    if (string.IsNullOrWhiteSpace(directory))
-                        throw new ArgumentException("Invalid output path.");
-
-                    if (!Directory.Exists(directory))
-                        Directory.CreateDirectory(directory);
-
-                    var snapshot = new SystemSnapshot (
-                        envBase64: Utility.EncodeToBase64(PrintEnv()),
-                        hostsBase64: Utility.EncodeToBase64(GetHosts())
-                    );
-
-                    File.WriteAllText(
-                        outputPath,
-                        JsonConvert.SerializeObject(snapshot)
-                    );
+                    ZipFile.CreateFromDirectory(endiffoTempPath, outputPath);
 
                     return 0;
                 });

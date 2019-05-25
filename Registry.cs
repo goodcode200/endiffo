@@ -11,25 +11,27 @@ namespace endiffo
     // Exceptions NOT to throw: https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/using-standard-exception-types
     public static class RegistryHandler
     {
-        public static void GetKeys()
+        public static void GetKeys(string filename)
         {
-            #if OS_Windows
-                List<string> output = new List<string>();
-
-                RegistryKey rkey = Registry.Users;
-
-                output.Add("Subkeys of " + rkey.Name);
-                output.Add("-----------------------------------------------");
-
-                // Print the contents of the array to the console.
-                foreach (String s in rkey.GetSubKeyNames())
-                {
-                    output.Add(s);
-                }
-
-                File.WriteAllLines("registry.txt", output);
+            #if !OS_Windows
+            throw new Exception("RegistryHandler function not available outside Windows.");
             #else
-                throw new Exception("RegistryHandler function not available outside Windows.");
+
+            var output = new List<string>();
+
+            RegistryKey rkey = Registry.Users;
+
+            output.Add("Subkeys of " + rkey.Name);
+            output.Add("-----------------------------------------------");
+
+            // Print the contents of the array to the console.
+            foreach (String s in rkey.GetSubKeyNames())
+            {
+                output.Add(s);
+            }
+
+            File.WriteAllLines(filename, output);
+
             #endif
         }
     }
