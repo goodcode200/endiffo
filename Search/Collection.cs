@@ -14,7 +14,10 @@ namespace endiffo.Search
             Available = new Dictionary<object, ISearch>();
         }
 
-        internal static IEnumerable<ISearch> AllItems { get { return Available.Select(a => a.Value); } }
+        internal static IEnumerable<ISearch> AllItems()
+        {
+            return Available.Select(a => a.Value);
+        }
 
         internal static bool TryAdd(ISearch value)
         {

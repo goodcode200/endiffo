@@ -1,29 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using endiffo.Search;
 using endiffo.Worker;
-namespace Worker
+namespace endiffo.Worker
 {
     public class Marshal
     {
 
-        private Depository Depository { get; set; }
+        private Writer Writer { get; set; }
 
         public Marshal()
         {
-            Depository = new Depository();
+            InitialiseCollection();
+            Writer = new Writer();
 
-            Parallel.ForEach(Collection.AllItems, i => Depository.RecieveResult(i.GetResult()));
+            var t = Collection.AllItems().ToArray();
 
-            var searches = new List<Task<endiffo.Search.Result>>();
+            Parallel.ForEach(t, i => Writer.RecieveResult(i.GetResult()));
+            Writer.WorkIsExpected = false;
+            Writer.ResultReady.Set();
 
-            foreach (var item in endiffo.Search.Collection.AllItems)
-            {
-                searches.Add(Task.Run(() => item.GetResult()));
-            }
+            Thread.Sleep(1000);
 
-            Task.WaitAll(searches.ToArray());
+
+            //var searches = new List<Task<endiffo.Search.Result>>();
+
+            //foreach (var item in endiffo.Search.Collection.AllItems)
+            //{
+            //    searches.Add(Task.Run(() => item.GetResult()));
+            //}
+
+            //Task.WaitAll(searches.ToArray());
 
             var wait = 1;
         }

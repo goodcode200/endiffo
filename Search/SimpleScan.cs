@@ -5,16 +5,17 @@ using System.Text;
 
 namespace endiffo.Search
 {
-    public class SimpleScan : ISearch
+    internal class SimpleScan : ISearch
     {
-        public Result GetResult()
+        Result ISearch.GetResult()
         {
-            var result = new Result();
+            var result = new Result() { Source = this };
 
             foreach (var env in Environment.GetEnvironmentVariables())
             {
                 if (env is DictionaryEntry e) result.Values.Add(e.Key, e.Value);
             }
+
             return result;
         }
     }

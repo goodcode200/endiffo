@@ -38,8 +38,9 @@ namespace endiffo
         static void Main(string[] args)
         {
             try
-            {
-                new Marshal();
+            { 
+                new Worker.Marshal();
+                return;
                 var app = new CommandLineApplication();
 
                 var outputOption = app.Option(

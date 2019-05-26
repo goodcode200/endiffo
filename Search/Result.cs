@@ -4,11 +4,13 @@ using System.Text;
 
 namespace endiffo.Search
 {
-    public class Result
+    internal class Result
     {
-        public IDictionary<object, object> Values { get; set; }
+        internal IDictionary<object, object> Values { get; set; }
 
-        public Result()
+        internal ISearch Source { get; set; }
+
+        internal Result()
         {
             Values = new Dictionary<object, object>();
         }
