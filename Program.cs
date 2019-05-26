@@ -39,6 +39,7 @@ namespace endiffo
         {
             try
             {
+                new Marshal();
                 var app = new CommandLineApplication();
 
                 var outputOption = app.Option(
