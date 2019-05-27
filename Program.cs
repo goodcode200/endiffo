@@ -67,6 +67,20 @@ namespace endiffo
             process.WaitForExit();
         }
 
+        static void HandleRegistry(string endiffoTempPath, List<string> registryKeys)
+        {
+            var regKeyInfo = new List<RegistryKeyInfo>();
+            foreach (string key in registryKeys)
+            {
+                string filename = System.Guid.NewGuid() + ".reg";
+                RegeditExportKey(key, Path.Join(endiffoTempPath, filename));
+                regKeyInfo.Add(new RegistryKeyInfo(key, filename));
+            }
+
+            string regKeyJsonStr = JsonConvert.SerializeObject(regKeyInfo, Formatting.Indented);
+            File.WriteAllText(Path.Join(endiffoTempPath, "keys.json"), regKeyJsonStr);
+        }
+
         /// Start a command-line application which saves a snapshot of the system in a zip file.
         static void Main(string[] args)
         {
@@ -105,18 +119,7 @@ namespace endiffo
                     if (config.Hosts)
                         File.Copy(Utility.GetHostsFilePath(), Path.Join(endiffoTempPath, "hosts"));
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                    {
-                        var regKeyInfo = new List<RegistryKeyInfo>();
-                        foreach (string key in config.RegistryKeys)
-                        {
-                            string filename = System.Guid.NewGuid() + ".reg";
-                            RegeditExportKey(key, Path.Join(endiffoTempPath, filename));
-                            regKeyInfo.Add(new RegistryKeyInfo(key, filename));
-                        }
-
-                        string regKeyJsonStr = JsonConvert.SerializeObject(regKeyInfo, Formatting.Indented);
-                        File.WriteAllText(Path.Join(endiffoTempPath, "keys.json"), regKeyJsonStr);
-                    }
+                        HandleRegistry(endiffoTempPath, config.RegistryKeys);
                     //    RegistryHandler.GetKeys(Path.Join(endiffoTempPath, "registry.txt"));
 
                     string outputPath = outputOption.HasValue()
