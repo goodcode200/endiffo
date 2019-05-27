@@ -39,10 +39,10 @@ namespace endiffo
         {
             try
             { 
-                new Worker.Marshal();
+                new Worker.Engine(new string[] { "SimpleScan" }, @"C:\Test\Output.zip");
                 return;
-                var app = new CommandLineApplication();
 
+                var app = new CommandLineApplication();
                 var outputOption = app.Option(
                     Constants.OUTPUT_CMDLINE_FLAG,
                     "Determines the file to save a snapshot to.",
