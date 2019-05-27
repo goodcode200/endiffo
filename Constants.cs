@@ -9,6 +9,8 @@ namespace endiffo
         public const string ENVIRON_VAR_COMMAND = "printenv";
         public const string REGEDIT_COMMAND = "reg";
 
+        public const string DEFAULT_CONFIG_FILENAME = "endiffo.json";
+
         /// The beginning of the default snapshot filename.
         /// Is followed by the DATETIME_FORMAT defined below.
         public const string DEFAULT_SNAPSHOT_FILENAME_BASE = "snapshot_UTC_";

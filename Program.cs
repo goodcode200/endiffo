@@ -93,8 +93,11 @@ namespace endiffo
                     else
                         Directory.CreateDirectory(endiffoTempPath);
 
-                        var configJsonStr = File.ReadAllText("endiffo.json");
-                        var config = JsonConvert.DeserializeObject<ConfigFile>(configJsonStr);
+                    var configFilename = configOption.HasValue()
+                        ? configOption.Value()
+                        : Constants.DEFAULT_CONFIG_FILENAME;
+                    var configJsonStr = File.ReadAllText(configFilename);
+                    var config = JsonConvert.DeserializeObject<ConfigFile>(configJsonStr);
 
                     // Todo: Use streamWriter
                     if (config.EnvVars)
