@@ -7,6 +7,7 @@ namespace endiffo
         public const string WINDOWS_HOSTS_FILE_PATH = "C:/Windows/System32/drivers/etc/hosts";
         public const string LINUX_HOSTS_FILE_PATH = "/etc/hosts";
         public const string ENVIRON_VAR_COMMAND = "printenv";
+        public const string REGEDIT_COMMAND = "reg";
 
         /// The beginning of the default snapshot filename.
         /// Is followed by the DATETIME_FORMAT defined below.
@@ -15,6 +16,9 @@ namespace endiffo
 
         /// Use dots instead of colons in a filename, or Windows complains.
         public const string DATETIME_FORMAT = "yyyy-MM-ddTHH.mm.ssZ";
-        public const string OUTPUT_CMDLINE_FLAG = "-o |--output";
+
+        /// Command-line options
+        public const string CMDLINE_OPT_CONFIG = "-c |--config";
+        public const string CMDLINE_OPT_OUTPUT = "-o |--output";
     }
 }

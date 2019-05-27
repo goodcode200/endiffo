@@ -1,12 +1,29 @@
 #if OS_Windows
 using Microsoft.Win32;
 #endif
+using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Collections.Generic;
 
 namespace endiffo
 {
+    /// RegistryKeyInfo is intended to be used as elements of a list which is serialised.
+    public struct RegistryKeyInfo
+    {
+        [JsonProperty]
+        public readonly string RegistryKey;
+
+        [JsonProperty]
+        public readonly string Filename;
+
+        public RegistryKeyInfo(string regKey, string filename)
+        {
+            RegistryKey = regKey;
+            Filename = filename;
+        }
+    }
+
     /// Reference: https://docs.microsoft.com/en-us/dotnet/api/microsoft.win32.registry?view=netframework-4.8
     /// Exceptions NOT to throw: https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/using-standard-exception-types
     public static class RegistryHandler
