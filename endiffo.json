@@ -1,0 +1,6 @@
+{
+  "Hosts": true,
+  "EnvVars": true,
+  "RegistryKeys": ["HKEY_CURRENT_USER\\Test"],
+  "IgnoreRegistryKeys": []
+}

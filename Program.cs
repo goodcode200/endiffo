@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.CommandLineUtils;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
@@ -21,6 +22,7 @@ namespace endiffo
                 {
                     FileName = Constants.ENVIRON_VAR_COMMAND,
                     RedirectStandardOutput = true,
+                    RedirectStandardError = true,
                     UseShellExecute = false,
                     CreateNoWindow = true,
                 }
@@ -34,6 +36,51 @@ namespace endiffo
             return result;
         }
 
+        /// Creates empty config file.
+        static void CreateEmptyConfigFile()
+        {
+            ConfigFile config = new ConfigFile(true, true, new List<string>());
+            string configJsonStr = JsonConvert.SerializeObject(config, Formatting.Indented);
+            File.WriteAllText("endiffo.json", configJsonStr);
+        }
+
+        static void RegeditExportKey(string key, string exportFile)
+        {
+            string argumentStr = "export \"" + key + "\" \"" + exportFile + "\"";
+
+            var process = new Process()
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = Constants.REGEDIT_COMMAND,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    Arguments = argumentStr,
+                }
+            };
+
+            Console.WriteLine("Running command " + Constants.REGEDIT_COMMAND + " " + argumentStr);
+
+            process.Start();
+            process.WaitForExit();
+        }
+
+        static void HandleRegistry(string endiffoTempPath, List<string> registryKeys)
+        {
+            var regKeyInfo = new List<RegistryKeyInfo>();
+            foreach (string key in registryKeys)
+            {
+                string filename = System.Guid.NewGuid() + ".reg";
+                RegeditExportKey(key, Path.Join(endiffoTempPath, filename));
+                regKeyInfo.Add(new RegistryKeyInfo(key, filename));
+            }
+
+            string regKeyJsonStr = JsonConvert.SerializeObject(regKeyInfo, Formatting.Indented);
+            File.WriteAllText(Path.Join(endiffoTempPath, "keys.json"), regKeyJsonStr);
+        }
+
         /// Start a command-line application which saves a snapshot of the system in a zip file.
         static void Main(string[] args)
         {
@@ -43,11 +90,16 @@ namespace endiffo
                 return;
 
                 var app = new CommandLineApplication();
+                var configOption = app.Option(
+                    Constants.CMDLINE_OPT_CONFIG,
+                    "Determines the file to load settings from.",
+                    CommandOptionType.SingleValue);
+
                 var outputOption = app.Option(
-                    Constants.OUTPUT_CMDLINE_FLAG,
+                    Constants.CMDLINE_OPT_OUTPUT,
                     "Determines the file to save a snapshot to.",
                     CommandOptionType.SingleValue);
-                
+
                 app.OnExecute(() =>
                 {
                     string endiffoTempPath = Path.Join(Utility.GetTempFolder(), ".endiffo");
@@ -57,11 +109,20 @@ namespace endiffo
                     else
                         Directory.CreateDirectory(endiffoTempPath);
 
+                    var configFilename = configOption.HasValue()
+                        ? configOption.Value()
+                        : Constants.DEFAULT_CONFIG_FILENAME;
+                    var configJsonStr = File.ReadAllText(configFilename);
+                    var config = JsonConvert.DeserializeObject<ConfigFile>(configJsonStr);
+
                     // Todo: Use streamWriter
-                    File.WriteAllText(Path.Join(endiffoTempPath, "printenv"), PrintEnv());
-                    File.Copy(Utility.GetHostsFilePath(), Path.Join(endiffoTempPath, "hosts"));
+                    if (config.EnvVars)
+                        File.WriteAllText(Path.Join(endiffoTempPath, "printenv"), PrintEnv());
+                    if (config.Hosts)
+                        File.Copy(Utility.GetHostsFilePath(), Path.Join(endiffoTempPath, "hosts"));
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                        RegistryHandler.GetKeys(Path.Join(endiffoTempPath, "registry.txt"));
+                        HandleRegistry(endiffoTempPath, config.RegistryKeys);
+                    //    RegistryHandler.GetKeys(Path.Join(endiffoTempPath, "registry.txt"));
 
                     string outputPath = outputOption.HasValue()
                         ? outputOption.Value()
