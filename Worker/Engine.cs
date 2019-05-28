@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using endiffo.Search;
@@ -26,9 +27,9 @@ namespace endiffo.Worker
         /// <param name="searches">The searches to perform.</param>
         /// <param name="output">Where to store the output.</param>
         /// <remarks>A better method of sending searches through as arguments is required.</remarks>
-        public Engine(string[] searches, string output)
+        public Engine(string[] searches, List<string> regKeys, string output)
         {
-            InitialiseCollection(searches);
+            InitialiseCollection(searches, regKeys);
             Writer = new Writer(output);
 
             //Foreach of the required searches, generate results and send them to the writer.
@@ -48,11 +49,17 @@ namespace endiffo.Worker
         /// </summary>
         /// <param name="searches">The searches to perform</param>
         /// <remarks>This is not an optimal solution for many search options.</remarks>
-        private void InitialiseCollection(string[] searches)
+        private void InitialiseCollection(string[] searches, List<string> regKeys)
         {
             Searches = new Collection();
 
-            if (searches.Contains("SimpleScan")) Searches.TryAdd(new SimpleScan());
+            if (searches.Contains("SimpleScan")) Searches.TryAdd(new SimpleScan("simple.json"));
+
+            if (regKeys != null)
+            {
+                foreach (string regKey in regKeys)
+                    Searches.TryAdd(new RegistryScan(regKey, System.Guid.NewGuid() + ".reg"));
+            }
         }
     }
 }

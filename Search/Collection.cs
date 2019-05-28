@@ -39,7 +39,7 @@ namespace endiffo.Search
         /// <returns>True if is added. False if it already exists.</returns>
         internal bool TryAdd(ISearch value)
         {
-            return Available.TryAdd(nameof(ISearch), value);
+            return Available.TryAdd(value.GetFilename(), value);
         }
     }
 }

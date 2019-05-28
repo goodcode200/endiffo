@@ -44,36 +44,13 @@ namespace endiffo
             File.WriteAllText("endiffo.json", configJsonStr);
         }
 
-        static void RegeditExportKey(string key, string exportFile)
-        {
-            string argumentStr = "export \"" + key + "\" \"" + exportFile + "\"";
-
-            var process = new Process()
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = Constants.REGEDIT_COMMAND,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    Arguments = argumentStr,
-                }
-            };
-
-            Console.WriteLine("Running command " + Constants.REGEDIT_COMMAND + " " + argumentStr);
-
-            process.Start();
-            process.WaitForExit();
-        }
-
         static void HandleRegistry(string endiffoTempPath, List<string> registryKeys)
         {
             var regKeyInfo = new List<RegistryKeyInfo>();
             foreach (string key in registryKeys)
             {
                 string filename = System.Guid.NewGuid() + ".reg";
-                RegeditExportKey(key, Path.Join(endiffoTempPath, filename));
+                Utility.RegeditExportKey(key, Path.Join(endiffoTempPath, filename));
                 regKeyInfo.Add(new RegistryKeyInfo(key, filename));
             }
 
@@ -86,10 +63,8 @@ namespace endiffo
         {
             try
             { 
-                new Worker.Engine(new string[] { "SimpleScan" }, @"C:\Test\Output.zip");
-                return;
-
                 var app = new CommandLineApplication();
+
                 var configOption = app.Option(
                     Constants.CMDLINE_OPT_CONFIG,
                     "Determines the file to load settings from.",
@@ -105,9 +80,9 @@ namespace endiffo
                     string endiffoTempPath = Path.Join(Utility.GetTempFolder(), ".endiffo");
 
                     if (Directory.Exists(endiffoTempPath))
-                        Utility.CleanDirectory(endiffoTempPath);
+                        Utility.CleanTempFolder();
                     else
-                        Directory.CreateDirectory(endiffoTempPath);
+                        Directory.CreateDirectory(Utility.GetEndiffoTempPath());
 
                     var configFilename = configOption.HasValue()
                         ? configOption.Value()
@@ -115,26 +90,33 @@ namespace endiffo
                     var configJsonStr = File.ReadAllText(configFilename);
                     var config = JsonConvert.DeserializeObject<ConfigFile>(configJsonStr);
 
-                    // Todo: Use streamWriter
-                    if (config.EnvVars)
-                        File.WriteAllText(Path.Join(endiffoTempPath, "printenv"), PrintEnv());
-                    if (config.Hosts)
-                        File.Copy(Utility.GetHostsFilePath(), Path.Join(endiffoTempPath, "hosts"));
-                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                        HandleRegistry(endiffoTempPath, config.RegistryKeys);
-                    //    RegistryHandler.GetKeys(Path.Join(endiffoTempPath, "registry.txt"));
-
                     string outputPath = outputOption.HasValue()
                         ? outputOption.Value()
                         : Utility.GetSnapshotFileName();
 
-                    if (string.IsNullOrWhiteSpace(outputPath)
-                        || outputPath.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
-                        throw new ArgumentException("Invalid output path.");
+                    new Worker.Engine(
+                        new string[] { "SimpleScan" },
+                        (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                            ? config.RegistryKeys
+                            : null),
+                        outputPath);
 
-                    ZipFile.CreateFromDirectory(endiffoTempPath, outputPath);
+                    // // Todo: Use streamWriter
+                    // if (config.EnvVars)
+                    //     File.WriteAllText(Path.Join(endiffoTempPath, "printenv"), PrintEnv());
+                    // if (config.Hosts)
+                    //     File.Copy(Utility.GetHostsFilePath(), Path.Join(endiffoTempPath, "hosts"));
+                    // // if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    // //     HandleRegistry(endiffoTempPath, config.RegistryKeys);
+                    // //    RegistryHandler.GetKeys(Path.Join(endiffoTempPath, "registry.txt"));
 
-                    Utility.CleanDirectory(endiffoTempPath);
+                    // if (string.IsNullOrWhiteSpace(outputPath)
+                    //     || outputPath.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
+                    //     throw new ArgumentException("Invalid output path.");
+
+                    // ZipFile.CreateFromDirectory(endiffoTempPath, outputPath);
+
+                    Utility.CleanTempFolder();
 
                     return 0;
                 });

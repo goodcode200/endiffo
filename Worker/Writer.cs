@@ -14,6 +14,8 @@ namespace endiffo.Worker
     /// </summary>
     internal class Writer
     {
+        private static object zipLock = new object();
+
         /// <summary>
         /// Results that are recieved and are to be written.
         /// </summary>
@@ -99,11 +101,11 @@ namespace endiffo.Worker
         /// <param name="result">The result to be written to the zip file.</param>
         private void WriteResultAsync(ISearch result)
         {
-            var entry = OutputFile.CreateEntry(nameof(result));
+            var entry = OutputFile.CreateEntry(result.GetFilename());
 
-            using (var streamWriter = new StreamWriter(entry.Open()))
-            {
-                streamWriter.Write(result.WriteResults());
+            using (var zipEntryStream = entry.Open())
+            {   
+                result.WriteResults().CopyTo(zipEntryStream);
             }
         }
     }

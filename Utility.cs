@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -25,10 +26,14 @@ namespace endiffo
 
         /// Deletes all files and folders inside a directory.
         /// Be careful with this!
-        public static void CleanDirectory(string path)
+        public static void CleanTempFolder()
         {
+            string path = GetEndiffoTempPath();
+
             if (string.IsNullOrWhiteSpace(path)
-                || path.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
+                || path.IndexOfAny(Path.GetInvalidPathChars()) >= 0
+                || (!Directory.Exists(path))
+                )
                 throw new ArgumentException("Invalid path.");
 
             System.IO.DirectoryInfo di = new DirectoryInfo(path);
@@ -53,12 +58,40 @@ namespace endiffo
                 : "/tmp/";
         }
 
+        public static string GetEndiffoTempPath()
+        {
+            return Path.Join(Utility.GetTempFolder(), Constants.ENDIFFO_TEMP_FOLDER);
+        }
+
         /// Get the full path of the system's hosts file.
         public static string GetHostsFilePath()
         {
             return RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                 ? Constants.WINDOWS_HOSTS_FILE_PATH
                 : Constants.LINUX_HOSTS_FILE_PATH;
+        }
+
+        public static void RegeditExportKey(string key, string exportFile)
+        {
+            string argumentStr = "export \"" + key + "\" \"" + exportFile + "\"";
+
+            var process = new Process()
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = Constants.REGEDIT_COMMAND,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    Arguments = argumentStr,
+                }
+            };
+
+            Console.WriteLine("Running command " + Constants.REGEDIT_COMMAND + " " + argumentStr);
+
+            process.Start();
+            process.WaitForExit();
         }
     };
 }
