@@ -52,7 +52,11 @@ namespace endiffo.Worker
         {
             Searches = new Collection();
 
-            if (searches.Contains("SimpleScan")) Searches.TryAdd(new SimpleScan());
+            if (searches.Contains("SimpleScan"))
+            {
+                Searches.TryAdd(new SimpleScan());
+                Searches.TryAdd(new SimpleScan());
+            }
         }
     }
 }

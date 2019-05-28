@@ -16,6 +16,13 @@ namespace endiffo.Search
         /// </summary>
         private Dictionary<object,object> EnvironmentVariables { get; set; }
 
+        private string SearchName;
+
+        public SimpleScan()
+        {
+            SearchName = System.Guid.NewGuid() + ".txt";
+        }
+
         /// <summary>
         /// Copies environment variables into a new dictionary. 
         /// </summary>
@@ -27,6 +34,11 @@ namespace endiffo.Search
             {
                 if (env is DictionaryEntry e) EnvironmentVariables.Add(e.Key, e.Value);
             }
+        }
+
+        public string GetName()
+        {
+            return SearchName;
         }
 
         /// <summary>

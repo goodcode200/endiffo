@@ -99,7 +99,7 @@ namespace endiffo.Worker
         /// <param name="result">The result to be written to the zip file.</param>
         private void WriteResultAsync(ISearch result)
         {
-            var entry = OutputFile.CreateEntry(nameof(result));
+            var entry = OutputFile.CreateEntry(result.GetName());
 
             using (var streamWriter = new StreamWriter(entry.Open()))
             {
