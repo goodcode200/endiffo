@@ -85,7 +85,7 @@ namespace endiffo.Worker
                     ResultReady.WaitOne(new TimeSpan(0, 0, 10));
 
                     //If a result can be retrieved from the queue, write the results to file.
-                    if (Results.TryDequeue(out ISearch result)) WriteResultAsync(result);
+                    while (Results.TryDequeue(out ISearch result)) WriteResultAsync(result);
                 }
             }
             finally
