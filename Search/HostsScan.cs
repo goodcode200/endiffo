@@ -11,7 +11,7 @@ namespace endiffo.Search
         /// <summary>
         /// The filename to save this search result with.
         /// </summary>
-        private string Filename;
+        private readonly string Filename;
         
         /// <summary>
         /// Constructor
@@ -36,6 +36,10 @@ namespace endiffo.Search
             return Filename;
         }
 
+        /// <summary>
+        /// Stream the hosts file.
+        /// </summary>
+        /// <returns>A file stream of the hosts file.</returns>
         public Stream WriteResults()
         {
             string tempFilePath = Path.Join(Utility.GetEndiffoTempPath(), Filename);

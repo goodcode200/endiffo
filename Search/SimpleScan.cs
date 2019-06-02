@@ -15,7 +15,7 @@ namespace endiffo.Search
         /// <summary>
         /// The filename to save the search result with.
         /// </summary>
-        private string Filename;
+        private readonly string Filename;
 
         /// <summary>
         /// The environment variables that are currently in use on the system.

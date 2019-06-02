@@ -12,55 +12,10 @@ namespace endiffo
 {
     static class Program
     {
-        // TODO Test the SimpleScan on Linux before removing this commented code.
-        // /// Get a string containing the exact output of the printenv command.
-        // /// This so far seems to work the exact same way on Windows and Linux.
-        // static string PrintEnv()
-        // {
-        //     var process = new Process()
-        //     {
-        //         StartInfo = new ProcessStartInfo
-        //         {
-        //             FileName = Constants.ENVIRON_VAR_COMMAND,
-        //             RedirectStandardOutput = true,
-        //             RedirectStandardError = true,
-        //             UseShellExecute = false,
-        //             CreateNoWindow = true,
-        //         }
-        //     };
-
-        //     process.Start();
-        //     string result = process.StandardOutput.ReadToEnd();
-
-        //     // TODO The application could potentially freeze anywhere it executes an external command.
-        //     process.WaitForExit();
-        //     return result;
-        // }
-
-        /// Creates empty config file.
-        static void CreateEmptyConfigFile()
-        {
-            ConfigFile config = new ConfigFile(true, true, new List<string>());
-            string configJsonStr = JsonConvert.SerializeObject(config, Formatting.Indented);
-            File.WriteAllText("endiffo.json", configJsonStr);
-        }
-
-        // TODO test the RegistryScan on Linux before removing this commented code.
-        // static void HandleRegistry(string endiffoTempPath, List<string> registryKeys)
-        // {
-        //     var regKeyInfo = new List<RegistryKeyInfo>();
-        //     foreach (string key in registryKeys)
-        //     {
-        //         string filename = System.Guid.NewGuid() + ".reg";
-        //         Utility.RegeditExportKey(key, Path.Join(endiffoTempPath, filename));
-        //         regKeyInfo.Add(new RegistryKeyInfo(key, filename));
-        //     }
-
-        //     string regKeyJsonStr = JsonConvert.SerializeObject(regKeyInfo, Formatting.Indented);
-        //     File.WriteAllText(Path.Join(endiffoTempPath, "keys.json"), regKeyJsonStr);
-        // }
-
+        /// <summary>
         /// Start a command-line application which saves a snapshot of the system in a zip file.
+        /// </summary>
+        /// <param name="args">Parameters for options like specifying files.</param>
         static void Main(string[] args)
         {
             try
@@ -103,21 +58,6 @@ namespace endiffo
                             : null),
                         outputPath);
 
-                    // // Todo: Use streamWriter
-                    // if (config.EnvVars)
-                    //     File.WriteAllText(Path.Join(endiffoTempPath, "printenv"), PrintEnv());
-                    // if (config.Hosts)
-                    //     File.Copy(Utility.GetHostsFilePath(), Path.Join(endiffoTempPath, "hosts"));
-                    // // if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                    // //     HandleRegistry(endiffoTempPath, config.RegistryKeys);
-                    // //    RegistryHandler.GetKeys(Path.Join(endiffoTempPath, "registry.txt"));
-
-                    // if (string.IsNullOrWhiteSpace(outputPath)
-                    //     || outputPath.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
-                    //     throw new ArgumentException("Invalid output path.");
-
-                    // ZipFile.CreateFromDirectory(endiffoTempPath, outputPath);
-
                     Utility.CleanTempFolder();
 
                     return 0;
@@ -130,7 +70,6 @@ namespace endiffo
                 Console.WriteLine (
                     "An error occurred and the application had to terminate." + Environment.NewLine
                     + "Error text: " + ex.Message + Environment.NewLine
-                    //+ "Inner exception: " + ex.InnerException + Environment.NewLine
                     + "Stack trace: " + Environment.NewLine + ex.StackTrace
                 );
             }

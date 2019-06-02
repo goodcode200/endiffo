@@ -13,12 +13,12 @@ namespace endiffo.Search
         /// <summary>
         /// Registry key to scan
         /// </summary>
-        private string RegistryKey;
+        private readonly string RegistryKey;
 
         /// <summary>
         /// File name to save result with.
         /// </summary>
-        public string Filename;
+        public readonly string Filename;
 
         /// <summary>
         /// Constructor
@@ -45,6 +45,10 @@ namespace endiffo.Search
         /// </summary>
         public void GenerateResults() {}
         
+        /// <summary>
+        /// Export the registry key to a temporary file and return it as a file stream.
+        /// </summary>
+        /// <returns></returns>
         public Stream WriteResults()
         {
             string filePath = Path.Join(Utility.GetEndiffoTempPath(), Filename);
@@ -52,6 +56,11 @@ namespace endiffo.Search
             return new FileStream(filePath, FileMode.Open);
         }
 
+        /// <summary>
+        /// Export a given key to a given file.
+        /// </summary>
+        /// <param name="key">The registry key to export.</param>
+        /// <param name="exportFile">The file to export registry data to.</param>
         private static void RegeditExportKey(string key, string exportFile)
         {
             string argumentStr = "export \"" + key + "\" \"" + exportFile + "\"";
