@@ -137,7 +137,6 @@ namespace endiffo.Comparison
 
         private void CompareJson(Dictionary<object,object> json1,Dictionary<object,object> json2)
         {
-
             var matchedItems = new HashSet<object>();
 
             foreach (var item1 in json1)
@@ -147,7 +146,6 @@ namespace endiffo.Comparison
                     //Compare value
                     if (!item1.Value.Equals(item2Value))
                     {
-                        new Result.ItemDifference(item1.Key, item1.Value, item2Value);
                         //Register difference
                     }
 
@@ -155,7 +153,6 @@ namespace endiffo.Comparison
                 }
                 else
                 {
-                    new Result.ItemDifference(item1.Key, item1.Value, null);
                     //Register that item1 entry does not exist in json2 
                 }
             }
@@ -164,7 +161,6 @@ namespace endiffo.Comparison
                 if (!matchedItems.Contains(item2.Key))
                 {
                     //Register that item2 entry does not exist in json1
-                    new Result.ItemDifference(item2.Key, null, item2.Value);
                 }
             }
             
