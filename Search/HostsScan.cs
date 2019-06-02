@@ -38,6 +38,7 @@ namespace endiffo.Search
 
         /// <summary>
         /// Stream the hosts file.
+        /// On Windows at least you cannot stream directly from the original location so it is copied to a temp folder first.
         /// </summary>
         /// <returns>A file stream of the hosts file.</returns>
         public Stream WriteResults()

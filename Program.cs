@@ -47,9 +47,10 @@ namespace endiffo
                     var configJsonStr = File.ReadAllText(configFilename);
                     var config = JsonConvert.DeserializeObject<ConfigFile>(configJsonStr);
 
+                    Directory.CreateDirectory("tmp");
                     string outputPath = outputOption.HasValue()
                         ? outputOption.Value()
-                        : Utility.GetSnapshotFileName();
+                        : Path.Join("tmp", Utility.GetSnapshotFileName());
 
                     new Worker.Engine(
                         new string[] { "SimpleScan", "HostsScan" },

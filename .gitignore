@@ -37,4 +37,4 @@ msbuild.wrn
 .vs/
 
 # Endiffo-specific
-snapshot_UTC_*.zip
+tmp/
