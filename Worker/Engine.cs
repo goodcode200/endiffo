@@ -54,6 +54,7 @@ namespace endiffo.Worker
             Searches = new Collection();
 
             if (searches.Contains("SimpleScan")) Searches.TryAdd(new SimpleScan("simple.json"));
+            if (searches.Contains("HostsScan")) Searches.TryAdd(new HostsScan("hosts"));
 
             if (regKeys != null)
             {

@@ -62,36 +62,5 @@ namespace endiffo
         {
             return Path.Join(Utility.GetTempFolder(), Constants.ENDIFFO_TEMP_FOLDER);
         }
-
-        /// Get the full path of the system's hosts file.
-        public static string GetHostsFilePath()
-        {
-            return RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? Constants.WINDOWS_HOSTS_FILE_PATH
-                : Constants.LINUX_HOSTS_FILE_PATH;
-        }
-
-        public static void RegeditExportKey(string key, string exportFile)
-        {
-            string argumentStr = "export \"" + key + "\" \"" + exportFile + "\"";
-
-            var process = new Process()
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = Constants.REGEDIT_COMMAND,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    Arguments = argumentStr,
-                }
-            };
-
-            Console.WriteLine("Running command " + Constants.REGEDIT_COMMAND + " " + argumentStr);
-
-            process.Start();
-            process.WaitForExit();
-        }
     };
 }

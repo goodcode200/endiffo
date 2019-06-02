@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace endiffo.Search
@@ -46,8 +48,31 @@ namespace endiffo.Search
         public Stream WriteResults()
         {
             string filePath = Path.Join(Utility.GetEndiffoTempPath(), Filename);
-            Utility.RegeditExportKey(RegistryKey, filePath);
+            RegeditExportKey(RegistryKey, filePath);
             return new FileStream(filePath, FileMode.Open);
+        }
+
+        private static void RegeditExportKey(string key, string exportFile)
+        {
+            string argumentStr = "export \"" + key + "\" \"" + exportFile + "\"";
+
+            var process = new Process()
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = Constants.REGEDIT_COMMAND,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    Arguments = argumentStr,
+                }
+            };
+
+            Console.WriteLine("Running command " + Constants.REGEDIT_COMMAND + " " + argumentStr);
+
+            process.Start();
+            process.WaitForExit();
         }
     }
 }

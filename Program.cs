@@ -12,29 +12,30 @@ namespace endiffo
 {
     static class Program
     {
-        /// Get a string containing the exact output of the printenv command.
-        /// This so far seems to work the exact same way on Windows and Linux.
-        static string PrintEnv()
-        {
-            var process = new Process()
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = Constants.ENVIRON_VAR_COMMAND,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                }
-            };
+        // TODO Test the SimpleScan on Linux before removing this commented code.
+        // /// Get a string containing the exact output of the printenv command.
+        // /// This so far seems to work the exact same way on Windows and Linux.
+        // static string PrintEnv()
+        // {
+        //     var process = new Process()
+        //     {
+        //         StartInfo = new ProcessStartInfo
+        //         {
+        //             FileName = Constants.ENVIRON_VAR_COMMAND,
+        //             RedirectStandardOutput = true,
+        //             RedirectStandardError = true,
+        //             UseShellExecute = false,
+        //             CreateNoWindow = true,
+        //         }
+        //     };
 
-            process.Start();
-            string result = process.StandardOutput.ReadToEnd();
+        //     process.Start();
+        //     string result = process.StandardOutput.ReadToEnd();
 
-            // TODO The application could potentially freeze anywhere it executes an external command.
-            process.WaitForExit();
-            return result;
-        }
+        //     // TODO The application could potentially freeze anywhere it executes an external command.
+        //     process.WaitForExit();
+        //     return result;
+        // }
 
         /// Creates empty config file.
         static void CreateEmptyConfigFile()
@@ -44,19 +45,20 @@ namespace endiffo
             File.WriteAllText("endiffo.json", configJsonStr);
         }
 
-        static void HandleRegistry(string endiffoTempPath, List<string> registryKeys)
-        {
-            var regKeyInfo = new List<RegistryKeyInfo>();
-            foreach (string key in registryKeys)
-            {
-                string filename = System.Guid.NewGuid() + ".reg";
-                Utility.RegeditExportKey(key, Path.Join(endiffoTempPath, filename));
-                regKeyInfo.Add(new RegistryKeyInfo(key, filename));
-            }
+        // TODO test the RegistryScan on Linux before removing this commented code.
+        // static void HandleRegistry(string endiffoTempPath, List<string> registryKeys)
+        // {
+        //     var regKeyInfo = new List<RegistryKeyInfo>();
+        //     foreach (string key in registryKeys)
+        //     {
+        //         string filename = System.Guid.NewGuid() + ".reg";
+        //         Utility.RegeditExportKey(key, Path.Join(endiffoTempPath, filename));
+        //         regKeyInfo.Add(new RegistryKeyInfo(key, filename));
+        //     }
 
-            string regKeyJsonStr = JsonConvert.SerializeObject(regKeyInfo, Formatting.Indented);
-            File.WriteAllText(Path.Join(endiffoTempPath, "keys.json"), regKeyJsonStr);
-        }
+        //     string regKeyJsonStr = JsonConvert.SerializeObject(regKeyInfo, Formatting.Indented);
+        //     File.WriteAllText(Path.Join(endiffoTempPath, "keys.json"), regKeyJsonStr);
+        // }
 
         /// Start a command-line application which saves a snapshot of the system in a zip file.
         static void Main(string[] args)
@@ -95,7 +97,7 @@ namespace endiffo
                         : Utility.GetSnapshotFileName();
 
                     new Worker.Engine(
-                        new string[] { "SimpleScan" },
+                        new string[] { "SimpleScan", "HostsScan" },
                         (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                             ? config.RegistryKeys
                             : null),
