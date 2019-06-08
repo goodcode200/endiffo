@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using endiffo.Comparison.Result;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +10,6 @@ namespace endiffo.Comparison
 {
     public class Engine
     {
-
         private FileInfo snapshot1;
 
         private FileInfo snapshot2;
@@ -18,17 +18,20 @@ namespace endiffo.Comparison
 
         private ZipArchive archive2;
 
-        public void Compare(string snapshotFilePath1, string snapshotFilePath2)
+        private List<IDifference> differences;
+
+        public List<IDifference> Compare(string snapshotFilePath1, string snapshotFilePath2)
         {
+            differences = new List<IDifference>();
             snapshot1 = new FileInfo(snapshotFilePath1);
             snapshot2 = new FileInfo(snapshotFilePath2);
 
             if (!SnapshotFilesExist())
             {
                 Console.WriteLine("Snapshot files do not exist.");
-                return;
             }
 
+            return differences;
         }
 
         private bool SnapshotFilesExist()
@@ -77,6 +80,7 @@ namespace endiffo.Comparison
                 if (match == null)
                 {
                     //entry1 does not exist in archive2, add it to differences
+                    differences.Add(new EntryDifference(entry1.Name, EntryDifference.Type.MissingEntry2));
                 }
                 else
                 {
@@ -91,7 +95,7 @@ namespace endiffo.Comparison
                 if (!matchedEntries.Contains(entry2.Name))
                 {
                     //entry2 does not exist in archive1 and must therefore be a difference
-                    //Add to differences
+                    differences.Add(new EntryDifference(entry2.Name, EntryDifference.Type.MissingEntry1));
                 }
             }
         }
@@ -117,6 +121,11 @@ namespace endiffo.Comparison
             return false;
         }
 
+        /// <summary>
+        /// Method not currently supported until a manifest system can be devised.
+        /// </summary>
+        /// <remarks>
+        /// <para>The concept of a manifest is that it will hold details about a particular entry and how to compare it to another entry with the same key.</para></remarks>
         private void UseManifestToCompare()
         {
             throw new NotImplementedException();
@@ -135,9 +144,8 @@ namespace endiffo.Comparison
             return json != null;
         }
 
-        private List<Result.ItemDifference> CompareJson(Dictionary<object,object> json1,Dictionary<object,object> json2)
+        private void CompareJson(Dictionary<object,object> json1,Dictionary<object,object> json2)
         {
-            var differences = new List<Result.ItemDifference>();
             var matchedItems = new HashSet<object>();
 
             foreach (var item1 in json1)
@@ -147,7 +155,7 @@ namespace endiffo.Comparison
                     //Compare value
                     if (!item1.Value.Equals(item2Value))
                     {
-                        differences.Add(new Result.ItemDifference(item1.Key, item1.Value, item2Value));
+                        differences.Add(new ItemDifference(item1.Key, item1.Value, item2Value));
                         //Register difference
                     }
 
@@ -167,8 +175,6 @@ namespace endiffo.Comparison
                     differences.Add(new Result.ItemDifference(item2.Key, null, item2.Value));
                 }
             }
-
-            return differences;
         }
     }
 }

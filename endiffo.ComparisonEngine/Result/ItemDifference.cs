@@ -4,7 +4,7 @@ using System.Text;
 
 namespace endiffo.Comparison.Result
 {
-    public struct ItemDifference
+    public struct ItemDifference : IDifference
     {
         public enum Type { Value, MissingValue1, MissingValue2}
 
@@ -22,6 +22,14 @@ namespace endiffo.Comparison.Result
             Value1 = value1;
             Value2 = value2;
             DifferenceType = value1 == null ? Type.MissingValue1 : value2 == null ? Type.MissingValue2 : Type.Value;
+        }
+
+        /// <summary>
+        /// Implement a method for printing the differences to a user
+        /// </summary>
+        void IDifference.PrintDifference()
+        {
+            throw new NotImplementedException();
         }
     }
 }
