@@ -25,11 +25,11 @@ namespace Endiffo.Comparison
             }
             catch (Exception ex)
             {
+                Archive1 = null;
+                Archive2 = null;
+                
                 Console.WriteLine(ex);
             }
-
-            Archive1 = null;
-            Archive2 = null;
         }
     }
 }
