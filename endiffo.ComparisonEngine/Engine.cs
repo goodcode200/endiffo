@@ -8,53 +8,13 @@ using System.Linq;
 
 namespace endiffo.Comparison
 {
-    public class Engine
+    public static class Engine
     {
-        private FileInfo snapshot1;
-
-        private FileInfo snapshot2;
-
-        private ZipArchive archive1;
-
-        private ZipArchive archive2;
-
-        private List<IDifference> differences;
-
-        public List<IDifference> Compare(string snapshotFilePath1, string snapshotFilePath2)
-        {
-            differences = new List<IDifference>();
-            snapshot1 = new FileInfo(snapshotFilePath1);
-            snapshot2 = new FileInfo(snapshotFilePath2);
-
-            if (!SnapshotFilesExist())
-            {
-                Console.WriteLine("Snapshot files do not exist.");
-            }
-
-            return differences;
-        }
-
-        private bool SnapshotFilesExist()
+        private static bool SnapshotFilesAreSuitable(ArchivePair pair)
         {
             try
             {
-                return (snapshot1.Exists && snapshot2.Exists);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
-            return false;
-        }
-
-        private bool SnapshotFilesAreSuitable()
-        {
-            try
-            {
-                archive1 = ZipFile.Open(snapshot1.FullName, ZipArchiveMode.Read);
-                archive2 = ZipFile.Open(snapshot2.FullName, ZipArchiveMode.Read);
-
-                return ZipArchiveHasEntries(archive1) && ZipArchiveHasEntries(archive2);
+                return ZipArchiveHasEntries(pair.Archive1) && ZipArchiveHasEntries(pair.Archive2);
             }
             catch (Exception ex)
             {
@@ -64,18 +24,19 @@ namespace endiffo.Comparison
             return false;
         }
 
-        private bool ZipArchiveHasEntries(ZipArchive archive)
+        private static bool ZipArchiveHasEntries(ZipArchive archive)
         {
             return archive?.Entries?.Count > 0;
         }
 
-        private void MatchEntriesAndCompare()
+        private static List<IDifference> MatchEntriesAndCompare(ArchivePair pair)
         {
+            var differences = new List<IDifference>();
             var matchedEntries = new HashSet<string>();
 
-            foreach (var entry1 in archive1.Entries)
+            foreach (var entry1 in pair.Archive1.Entries)
             {
-                var match = archive2.Entries.FirstOrDefault(e => e.Name == entry1.Name);
+                var match = pair.Archive2.Entries.FirstOrDefault(e => e.Name == entry1.Name);
 
                 if (match == null)
                 {
@@ -90,7 +51,7 @@ namespace endiffo.Comparison
                     matchedEntries.Add(entry1.Name);
                 }
             }
-            foreach (var entry2 in archive2.Entries)
+            foreach (var entry2 in pair.Archive2.Entries)
             {
                 if (!matchedEntries.Contains(entry2.Name))
                 {
@@ -98,25 +59,29 @@ namespace endiffo.Comparison
                     differences.Add(new EntryDifference(entry2.Name, EntryDifference.Type.MissingEntry1));
                 }
             }
-        }
 
-        private void GoCompare(ZipArchiveEntry entry1, ZipArchiveEntry entry2)
+            return differences;
+        }
+        
+
+        private static List<IDifference> GoCompare(ZipArchiveEntry entry1, ZipArchiveEntry entry2)
         {
             if (ManifestExists(entry1))
             {
-                UseManifestToCompare();
-                return;
+                return UseManifestToCompare();
             }
             else
             {
                 if (TryConvertAsJson(entry1, out Dictionary<object, object> json1) && TryConvertAsJson(entry2, out Dictionary<object, object> json2))
                 {
-                    CompareJson(json1, json2);
+                    return CompareJson(json1, json2);
                 }
             }
+
+            return null;
         }
 
-        private bool ManifestExists(ZipArchiveEntry entry)
+        private static bool ManifestExists(ZipArchiveEntry entry)
         {
             return false;
         }
@@ -126,12 +91,12 @@ namespace endiffo.Comparison
         /// </summary>
         /// <remarks>
         /// <para>The concept of a manifest is that it will hold details about a particular entry and how to compare it to another entry with the same key.</para></remarks>
-        private void UseManifestToCompare()
+        private static List<IDifference> UseManifestToCompare()
         {
             throw new NotImplementedException();
         }
 
-        private bool TryConvertAsJson(ZipArchiveEntry entry, out Dictionary<object, object> json)
+        private static bool TryConvertAsJson(ZipArchiveEntry entry, out Dictionary<object, object> json)
         {
             using (var zipStreamEntry = entry.Open())
             {
@@ -144,8 +109,10 @@ namespace endiffo.Comparison
             return json != null;
         }
 
-        private void CompareJson(Dictionary<object,object> json1,Dictionary<object,object> json2)
+        private static List<IDifference> CompareJson(Dictionary<object,object> json1,Dictionary<object,object> json2)
         {
+            var differences = new List<IDifference>();
+
             var matchedItems = new HashSet<object>();
 
             foreach (var item1 in json1)
@@ -175,6 +142,8 @@ namespace endiffo.Comparison
                     differences.Add(new Result.ItemDifference(item2.Key, null, item2.Value));
                 }
             }
+
+            return differences;
         }
     }
 }
