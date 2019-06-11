@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-using endiffo.Comparison.Result;
+using Endiffo.Comparison.Result;
 
-namespace endiffo.Comparison
+namespace Endiffo.Comparison
 {
     public class SnapshotInfoPair
     {

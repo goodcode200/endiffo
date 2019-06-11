@@ -1,5 +1,5 @@
 
-namespace endiffo
+namespace Endiffo
 {
     public static class Constants
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace endiffo.Search
+namespace Endiffo.Search
 {
     /// <summary>
     /// Holds a collection of searches that can be added to and retrieved.

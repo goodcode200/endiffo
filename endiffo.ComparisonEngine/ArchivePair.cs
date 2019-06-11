@@ -5,9 +5,9 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 
-using endiffo.Comparison.Result;
+using Endiffo.Comparison.Result;
 
-namespace endiffo.Comparison
+namespace Endiffo.Comparison
 {
     public struct ArchivePair
     {

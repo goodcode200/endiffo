@@ -1,4 +1,4 @@
-﻿using endiffo.Comparison.Result;
+﻿using Endiffo.Comparison.Result;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 
-namespace endiffo.Comparison
+namespace Endiffo.Comparison
 {
     public static class Engine
     {

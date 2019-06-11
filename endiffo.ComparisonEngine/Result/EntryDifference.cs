@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace endiffo.Comparison.Result
+namespace Endiffo.Comparison.Result
 {
     public struct EntryDifference : IDifference
     {

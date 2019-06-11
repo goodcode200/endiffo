@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace endiffo
+namespace Endiffo
 {
     public struct ConfigFile
     {

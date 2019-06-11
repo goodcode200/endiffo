@@ -6,7 +6,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 
-namespace endiffo
+namespace Endiffo
 {
     /// RegistryKeyInfo is intended to be used as elements of a list which is serialised.
     public struct RegistryKeyInfo

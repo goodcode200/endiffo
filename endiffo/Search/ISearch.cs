@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace endiffo.Search
+namespace Endiffo.Search
 {
     /// <summary>
     /// The search interface requires both a result generation and result writing method. This allows muliple searches that are entirely different to be processed in the same queue.
