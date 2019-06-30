@@ -1,4 +1,4 @@
-﻿using endiffo.Search;
+﻿using Endiffo.Search;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -7,15 +7,13 @@ using System.IO.Compression;
 using System.Text;
 using System.Threading;
 
-namespace endiffo.Worker
+namespace Endiffo.Worker
 {
     /// <summary>
     /// Provides the ability to recieve search results from multiple threads and to store them in a zip file.
     /// </summary>
     internal class Writer
     {
-        private static object zipLock = new object();
-
         /// <summary>
         /// Results that are recieved and are to be written.
         /// </summary>

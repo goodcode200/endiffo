@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace endiffo.Search
+namespace Endiffo.Search
 {
     /// <summary>
     /// SimpleScan is an example implementation of the ISearch interface. In this case, it retrieves environment variables.

@@ -1,7 +1,7 @@
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace endiffo.Search
+namespace Endiffo.Search
 {
     /// <summary>
     /// An instance of HostsScan retrieves the entire etc/hosts file.

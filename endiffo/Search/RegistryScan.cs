@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
-namespace endiffo.Search
+namespace Endiffo.Search
 {
     /// <summary>
     /// Scans for user-specified registry settings

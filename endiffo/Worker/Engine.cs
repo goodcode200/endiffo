@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using endiffo.Search;
+using Endiffo.Search;
 
-namespace endiffo.Worker
+namespace Endiffo.Worker
 {
     /// <summary>
     /// Provides multithreaded functionality for performing multiple search actions against an system.

@@ -8,7 +8,7 @@ using System.IO.Compression;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace endiffo
+namespace Endiffo
 {
     static class Program
     {
