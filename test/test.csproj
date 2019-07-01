@@ -16,4 +16,10 @@
     <ProjectReference Include="..\endiffo\endiffo.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="endiffo.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

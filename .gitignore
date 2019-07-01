@@ -38,3 +38,5 @@ msbuild.wrn
 
 # Endiffo-specific
 tmp/
+
+.ionide

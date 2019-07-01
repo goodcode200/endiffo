@@ -10,13 +10,18 @@ using System.Text;
 
 namespace Endiffo
 {
-    static class Program
+    public static class Program
     {
         /// <summary>
         /// Start a command-line application which saves a snapshot of the system in a zip file.
         /// </summary>
         /// <param name="args">Parameters for options like specifying files.</param>
         static void Main(string[] args)
+        {
+            Run(args);
+        }
+
+        public static (bool, string) Run(string[] args)
         {
             try
             { 
@@ -31,6 +36,8 @@ namespace Endiffo
                     Constants.CMDLINE_OPT_OUTPUT,
                     "Determines the file to save a snapshot to.",
                     CommandOptionType.SingleValue);
+
+                string outputPath = null;
 
                 app.OnExecute(() =>
                 {
@@ -48,7 +55,7 @@ namespace Endiffo
                     var config = JsonConvert.DeserializeObject<ConfigFile>(configJsonStr);
 
                     Directory.CreateDirectory("tmp");
-                    string outputPath = outputOption.HasValue()
+                    outputPath = outputOption.HasValue()
                         ? outputOption.Value()
                         : Path.Join("tmp", Utility.GetSnapshotFileName());
 
@@ -64,7 +71,7 @@ namespace Endiffo
                     return 0;
                 });
 
-                app.Execute(args);                
+                return (app.Execute(args) == 0, outputPath);
             }
             catch(Exception ex)
             {
@@ -73,6 +80,7 @@ namespace Endiffo
                     + "Error text: " + ex.Message + Environment.NewLine
                     + "Stack trace: " + Environment.NewLine + ex.StackTrace
                 );
+                return (false, null);
             }
         }
     }
