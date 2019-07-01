@@ -10,13 +10,28 @@ using System.Text;
 
 namespace Endiffo
 {
-    static class Program
+    public static class Program
     {
         /// <summary>
         /// Start a command-line application which saves a snapshot of the system in a zip file.
         /// </summary>
         /// <param name="args">Parameters for options like specifying files.</param>
         static void Main(string[] args)
+        {
+            // Here we don't need to do anything with the result of Run.
+            Run(args);
+        }
+
+        /// <summary>
+        /// Encapsulates the whole program in a testable form.
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns>
+        /// A tuple used for tests, consisting of:
+        /// 1. An integer indicating success or failure.
+        /// 2. The snapshot filename. Is null if there was a failure.
+        /// </returns>
+        public static (bool, string) Run(string [] args)
         {
             try
             { 
@@ -32,14 +47,15 @@ namespace Endiffo
                     "Determines the file to save a snapshot to.",
                     CommandOptionType.SingleValue);
 
+                string endiffoTempPath = Utility.GetEndiffoTempPath();
+                string outputFilename = null;
+
                 app.OnExecute(() =>
                 {
-                    string endiffoTempPath = Path.Join(Utility.GetTempFolder(), ".endiffo");
-
                     if (Directory.Exists(endiffoTempPath))
                         Utility.CleanTempFolder();
                     else
-                        Directory.CreateDirectory(Utility.GetEndiffoTempPath());
+                        Directory.CreateDirectory(endiffoTempPath);
 
                     var configFilename = configOption.HasValue()
                         ? configOption.Value()
@@ -47,24 +63,33 @@ namespace Endiffo
                     var configJsonStr = File.ReadAllText(configFilename);
                     var config = JsonConvert.DeserializeObject<ConfigFile>(configJsonStr);
 
-                    Directory.CreateDirectory("tmp");
-                    string outputPath = outputOption.HasValue()
+                    outputFilename = outputOption.HasValue()
                         ? outputOption.Value()
-                        : Path.Join("tmp", Utility.GetSnapshotFileName());
+                        : Utility.GetSnapshotFileName();
 
-                    new Worker.Engine(
-                        new string[] { "SimpleScan", "HostsScan" },
-                        (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                            ? config.RegistryKeys
-                            : null),
-                        outputPath);
+                    using
+                    (
+                        new Worker.Engine
+                        (
+                            new string[] { "SimpleScan", "HostsScan" },
+                            (
+                                RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                                ? config.RegistryKeys
+                                : null
+                            ),
+                            outputFilename
+                        )
+                    ) {}
+
+                    Console.WriteLine("Saving to file: " + outputFilename);
 
                     Utility.CleanTempFolder();
 
                     return 0;
                 });
 
-                app.Execute(args);                
+                app.Execute(args);
+                return (true, outputFilename);               
             }
             catch(Exception ex)
             {
@@ -73,6 +98,7 @@ namespace Endiffo
                     + "Error text: " + ex.Message + Environment.NewLine
                     + "Stack trace: " + Environment.NewLine + ex.StackTrace
                 );
+                return (false, null);
             }
         }
     }

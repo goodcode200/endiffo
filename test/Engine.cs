@@ -7,21 +7,21 @@ using System.Linq;
 
 namespace Endiffo.Comparison
 {
-    public class Engine
+    public class Engine: IDisposable
     {
 
-        private FileInfo snapshot1;
+        private FileInfo Snapshot1;
 
-        private FileInfo snapshot2;
+        private FileInfo Snapshot2;
 
-        private ZipArchive archive1;
+        private ZipArchive Archive1;
 
-        private ZipArchive archive2;
+        private ZipArchive Archive2;
 
         public void Compare(string snapshotFilePath1, string snapshotFilePath2)
         {
-            snapshot1 = new FileInfo(snapshotFilePath1);
-            snapshot2 = new FileInfo(snapshotFilePath2);
+            Snapshot1 = new FileInfo(snapshotFilePath1);
+            Snapshot2 = new FileInfo(snapshotFilePath2);
 
             if (!SnapshotFilesExist())
             {
@@ -35,7 +35,7 @@ namespace Endiffo.Comparison
         {
             try
             {
-                return (snapshot1.Exists && snapshot2.Exists);
+                return (Snapshot1.Exists && Snapshot2.Exists);
             }
             catch (Exception ex)
             {
@@ -48,10 +48,14 @@ namespace Endiffo.Comparison
         {
             try
             {
-                archive1 = ZipFile.Open(snapshot1.FullName, ZipArchiveMode.Read);
-                archive2 = ZipFile.Open(snapshot2.FullName, ZipArchiveMode.Read);
+                if (Archive1 != null)
+                    Archive1.Dispose();
+                if (Archive2 != null)
+                    Archive2.Dispose();
 
-                return ZipArchiveHasEntries(archive1) && ZipArchiveHasEntries(archive2);
+                Archive1 = ZipFile.Open(Snapshot1.FullName, ZipArchiveMode.Read);
+                Archive2 = ZipFile.Open(Snapshot2.FullName, ZipArchiveMode.Read);
+                return ZipArchiveHasEntries(Archive1) && ZipArchiveHasEntries(Archive2);
             }
             catch (Exception ex)
             {
@@ -70,9 +74,9 @@ namespace Endiffo.Comparison
         {
             var matchedEntries = new HashSet<string>();
 
-            foreach (var entry1 in archive1.Entries)
+            foreach (var entry1 in Archive1.Entries)
             {
-                var match = archive2.Entries.FirstOrDefault(e => e.Name == entry1.Name);
+                var match = Archive2.Entries.FirstOrDefault(e => e.Name == entry1.Name);
 
                 if (match == null)
                 {
@@ -86,7 +90,7 @@ namespace Endiffo.Comparison
                     matchedEntries.Add(entry1.Name);
                 }
             }
-            foreach (var entry2 in archive2.Entries)
+            foreach (var entry2 in Archive2.Entries)
             {
                 if (!matchedEntries.Contains(entry2.Name))
                 {
@@ -164,6 +168,14 @@ namespace Endiffo.Comparison
                 }
             }
             
+        }
+
+        public void Dispose()
+        {
+            if (Archive1 != null)
+                Archive1.Dispose();
+            if (Archive2 != null)
+                Archive2.Dispose();
         }
     }
 }

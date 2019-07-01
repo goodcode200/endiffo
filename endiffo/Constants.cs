@@ -11,6 +11,9 @@ namespace Endiffo
         public const string ENVIRON_VAR_COMMAND = "printenv";
         public const string REGEDIT_COMMAND = "reg";
 
+        /// <summary>
+        /// The place where external scripts can dump files before we can stream them.
+        /// </summary>
         public const string ENDIFFO_TEMP_FOLDER = ".endiffo";
         public const string DEFAULT_CONFIG_FILENAME = "endiffo.json";
 

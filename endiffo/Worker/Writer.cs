@@ -12,8 +12,10 @@ namespace Endiffo.Worker
     /// <summary>
     /// Provides the ability to recieve search results from multiple threads and to store them in a zip file.
     /// </summary>
-    internal class Writer
+    internal class Writer: IDisposable
     {
+        private bool bigError = false;
+
         /// <summary>
         /// Results that are recieved and are to be written.
         /// </summary>
@@ -51,11 +53,13 @@ namespace Endiffo.Worker
         /// <summary>
         /// By default deletes the output file if it already exists, then creates a new ZipFile.
         /// </summary>
-        /// <param name="outputFile">The path of the zip file.</param>
-        private void PrepareOutputFile(string outputFile)
+        /// <param name="outputFilename">The path of the zip file.</param>
+        private void PrepareOutputFile(string outputFilename)
         {
-            var fileInfo = new FileInfo(outputFile);
+            var fileInfo = new FileInfo(outputFilename);
             if (fileInfo.Exists) fileInfo.Delete();
+            //if (OutputFile != null)
+                //OutputFile.Dispose();
             OutputFile = ZipFile.Open(fileInfo.FullName, ZipArchiveMode.Create);
         }
 
@@ -82,6 +86,8 @@ namespace Endiffo.Worker
                     //Wait for limited period of time to be notified of results being ready. This may be too short for long running operations.
                     ResultReady.WaitOne(new TimeSpan(0, 0, 10));
 
+                    if (bigError)
+                        throw new Exception();
                     //If a result can be retrieved from the queue, write the results to file.
                     while (Results.TryDequeue(out ISearch result)) WriteResultAsync(result);
                 }
@@ -89,7 +95,7 @@ namespace Endiffo.Worker
             finally
             {
                 //Always dispose of the output file to release locks.
-                OutputFile.Dispose();
+                OutputFile?.Dispose();
             }
         }
 
@@ -105,6 +111,12 @@ namespace Endiffo.Worker
             {   
                 result.WriteResults().CopyTo(zipEntryStream);
             }
+        }
+
+        public void Dispose()
+        {
+            bigError = true;
+            OutputFile?.Dispose();
         }
     }
 }

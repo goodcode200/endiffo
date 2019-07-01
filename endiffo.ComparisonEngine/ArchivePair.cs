@@ -9,7 +9,7 @@ using Endiffo.Comparison.Result;
 
 namespace Endiffo.Comparison
 {
-    public struct ArchivePair
+    public struct ArchivePair: IDisposable
     {
         // These might work as immutable values.
         public ZipArchive Archive1;
@@ -30,6 +30,14 @@ namespace Endiffo.Comparison
                 
                 Console.WriteLine(ex);
             }
+        }
+
+        public void Dispose()
+        {
+            if (Archive1 != null)
+                Archive1.Dispose();
+            if (Archive2 != null)
+                Archive2.Dispose();
         }
     }
 }
