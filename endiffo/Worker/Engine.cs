@@ -9,7 +9,7 @@ namespace Endiffo.Worker
     /// <summary>
     /// Provides multithreaded functionality for performing multiple search actions against an system.
     /// </summary>
-    public class Engine
+    public class Engine: IDisposable
     {
         /// <summary>
         /// Where the output of the search results will be sent.
@@ -61,6 +61,11 @@ namespace Endiffo.Worker
                 foreach (string regKey in regKeys)
                     Searches.TryAdd(new RegistryScan(regKey, System.Guid.NewGuid() + ".reg"));
             }
+        }
+
+        public void Dispose()
+        {
+            Writer = null;
         }
     }
 }

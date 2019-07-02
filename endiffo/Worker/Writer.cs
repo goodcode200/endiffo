@@ -12,7 +12,7 @@ namespace Endiffo.Worker
     /// <summary>
     /// Provides the ability to recieve search results from multiple threads and to store them in a zip file.
     /// </summary>
-    internal class Writer
+    internal class Writer: IDisposable
     {
         /// <summary>
         /// Results that are recieved and are to be written.
@@ -90,6 +90,7 @@ namespace Endiffo.Worker
             {
                 //Always dispose of the output file to release locks.
                 OutputFile.Dispose();
+                OutputFile = null;
             }
         }
 
@@ -105,6 +106,12 @@ namespace Endiffo.Worker
             {   
                 result.WriteResults().CopyTo(zipEntryStream);
             }
+        }
+
+        public void Dispose()
+        {
+            OutputFile?.Dispose();
+            OutputFile = null;
         }
     }
 }

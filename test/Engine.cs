@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Endiffo.Comparison
 {
-    public class Engine
+    public class Engine: IDisposable
     {
 
         private FileInfo snapshot1;
@@ -164,6 +164,14 @@ namespace Endiffo.Comparison
                 }
             }
             
+        }
+
+        public void Dispose()
+        {
+            archive1?.Dispose();
+            archive1 = null;
+            archive2?.Dispose();
+            archive2 = null;
         }
     }
 }
