@@ -59,8 +59,7 @@ namespace Endiffo
                     if (!File.Exists(configFilename))
                         throw new ArgumentException("Config file does not exist at the specified location.");
 
-                    var configJsonStr = File.ReadAllText(configFilename);
-                    var config = JsonConvert.DeserializeObject<ConfigFile>(configJsonStr);
+                    var config = Utility.ReadConfig(configFilename);
 
                     outputPath = outputOption.HasValue()
                         ? outputOption.Value()

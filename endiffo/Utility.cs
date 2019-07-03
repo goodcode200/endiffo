@@ -29,6 +29,12 @@ namespace Endiffo
             string configJsonStr = JsonConvert.SerializeObject(config, Formatting.Indented);
             File.WriteAllText("endiffo.json", configJsonStr);
         }
+
+        public static ConfigFile ReadConfig(string filename)
+        {
+            var configJsonStr = File.ReadAllText(filename);
+            return JsonConvert.DeserializeObject<ConfigFile>(configJsonStr);
+        }
         
         /// <summary>
         /// Determine the filename of the zip we are saving everything in (minus the path)
