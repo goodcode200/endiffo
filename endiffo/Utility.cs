@@ -74,7 +74,7 @@ namespace Endiffo
         /// Might not be needed once we stream data directly into the zip file.
         /// </summary>
         /// <returns>The temp folder path.</returns>
-        public static string GetTempFolder()
+        public static string GetOsTempFolder()
         {
             return 
                 RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
@@ -88,7 +88,7 @@ namespace Endiffo
         /// <returns>Endiffo's temp path.</returns>
         public static string GetEndiffoTempPath()
         {
-            return Path.Join(Utility.GetTempFolder(), Constants.ENDIFFO_TEMP_FOLDER);
+            return Path.Join(Utility.GetOsTempFolder(), Constants.ENDIFFO_TEMP_FOLDER);
         }
     };
 }

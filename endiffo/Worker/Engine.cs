@@ -36,12 +36,20 @@ namespace Endiffo.Worker
             Parallel.ForEach(Searches.AllItems().ToArray(), i =>
             {
                 i.GenerateResults();
-                Writer.RecieveResult(i);
+                Writer.ReceiveResult(i);
             });
 
-            //Tell the writer that no more work is expected.
+            ReturnWhenFinished();
+        }
+
+        /// <summary>
+        /// Tell the writer that no more work is expected and return when all work is done by the Writer.
+        /// </summary>
+        private void ReturnWhenFinished()
+        {
             Writer.WorkIsExpected = false;
             Writer.ResultReady.Set();
+            Writer.ReturnWhenFinished();
         }
 
         /// <summary>
@@ -65,6 +73,7 @@ namespace Endiffo.Worker
 
         public void Dispose()
         {
+            Writer.Dispose();
             Writer = null;
         }
     }

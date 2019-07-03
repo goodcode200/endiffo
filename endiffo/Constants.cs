@@ -31,5 +31,10 @@ namespace Endiffo
         /// </summary>
         public const string CMDLINE_OPT_CONFIG = "-c |--config";
         public const string CMDLINE_OPT_OUTPUT = "-o |--output";
+
+        /// <summary>
+        /// This should include the name Endiffo in order to avoid conflicts.
+        /// </summary>
+        public const string TEMP_TEST_FOLDER = "EndiffoTempFolder";
     }
 }

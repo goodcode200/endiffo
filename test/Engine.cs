@@ -166,6 +166,9 @@ namespace Endiffo.Comparison
             
         }
 
+        /// <summary>
+        /// IDisposable implementation.
+        /// </summary>
         public void Dispose()
         {
             archive1?.Dispose();

@@ -10,12 +10,12 @@ using System.Threading;
 namespace Endiffo.Worker
 {
     /// <summary>
-    /// Provides the ability to recieve search results from multiple threads and to store them in a zip file.
+    /// Provides the ability to receive search results from multiple threads and to store them in a zip file.
     /// </summary>
     internal class Writer: IDisposable
     {
         /// <summary>
-        /// Results that are recieved and are to be written.
+        /// Results that are received and are to be written.
         /// </summary>
         private ConcurrentQueue<ISearch> Results { get; set; }
 
@@ -23,6 +23,11 @@ namespace Endiffo.Worker
         /// Used to determine when the next results are ready.
         /// </summary>
         internal AutoResetEvent ResultReady { get; set; }
+
+        /// <summary>
+        /// Used to fix a bug where we were Disposing objects while they were still needed on the spawned thread.
+        /// </summary>
+        private AutoResetEvent WriteResultThreadFinished = new AutoResetEvent(false);
 
         /// <summary>
         /// Denotes if further work is expected. This should be set to false when no more operations are expected.
@@ -34,6 +39,15 @@ namespace Endiffo.Worker
         /// </summary>
         /// <remarks>It may be better to use a third party zip library.</remarks>
         internal ZipArchive OutputFile { get; set; }
+
+        /// <summary>
+        /// Only call this after WorkIsExpected is set to false otherwise a deadlock will occur.
+        /// Returns when all work is done.
+        /// </summary>
+        public void ReturnWhenFinished()
+        {
+            WriteResultThreadFinished.WaitOne();
+        }
 
         /// <summary>
         /// Creates a new Writer object which prepares the output file and begins a new thread for handling the results.
@@ -60,10 +74,10 @@ namespace Endiffo.Worker
         }
 
         /// <summary>
-        /// Recieves results as an ISearch object. The results are added to the queue and ResultReady is notified.
+        /// Receives results as an ISearch object. The results are added to the queue and ResultReady is notified.
         /// </summary>
         /// <param name="result">The result which will be stored.</param>
-        internal void RecieveResult(ISearch result)
+        internal void ReceiveResult(ISearch result)
         {
             Results.Enqueue(result);
             ResultReady.Set();
@@ -92,6 +106,8 @@ namespace Endiffo.Worker
                 OutputFile.Dispose();
                 OutputFile = null;
             }
+
+            WriteResultThreadFinished.Set();
         }
 
         /// <summary>
@@ -108,6 +124,9 @@ namespace Endiffo.Worker
             }
         }
 
+        /// <summary>
+        /// IDisposable implementation.
+        /// </summary>
         public void Dispose()
         {
             OutputFile?.Dispose();

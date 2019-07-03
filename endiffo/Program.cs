@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -41,37 +42,48 @@ namespace Endiffo
 
                 app.OnExecute(() =>
                 {
-                    string endiffoTempPath = Path.Join(Utility.GetTempFolder(), ".endiffo");
+                    string endiffoTempPath = Utility.GetEndiffoTempPath();
 
                     if (Directory.Exists(endiffoTempPath))
                         Utility.CleanTempFolder();
                     else
-                        Directory.CreateDirectory(Utility.GetEndiffoTempPath());
+                        Directory.CreateDirectory(endiffoTempPath);
 
                     var configFilename = configOption.HasValue()
                         ? configOption.Value()
                         : Constants.DEFAULT_CONFIG_FILENAME;
+
+                    if (Path.GetInvalidPathChars().Any(x => configFilename.Contains(x)))
+                        throw new ArgumentException("Config file path contains invalid characters.");
+
+                    if (!File.Exists(configFilename))
+                        throw new ArgumentException("Config file does not exist at the specified location.");
+
                     var configJsonStr = File.ReadAllText(configFilename);
                     var config = JsonConvert.DeserializeObject<ConfigFile>(configJsonStr);
 
-                    Directory.CreateDirectory("tmp");
                     outputPath = outputOption.HasValue()
                         ? outputOption.Value()
-                        : Path.Join("tmp", Utility.GetSnapshotFileName());
+                        : Utility.GetSnapshotFileName();
 
-                    new Worker.Engine(
+                    if (Path.GetInvalidPathChars().Any(x => outputPath.Contains(x)))
+                        throw new ArgumentException("Output file path contains invalid characters.");
+
+                    using (var engine = new Worker.Engine(
                         new string[] { "SimpleScan", "HostsScan" },
                         (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
                             ? config.RegistryKeys
                             : null),
-                        outputPath);
+                        outputPath))
+                    {}
 
                     Utility.CleanTempFolder();
 
                     return 0;
                 });
 
-                return (app.Execute(args) == 0, outputPath);
+                app.Execute(args);
+                return (true, outputPath);
             }
             catch(Exception ex)
             {
