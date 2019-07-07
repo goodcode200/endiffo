@@ -119,8 +119,9 @@ namespace Endiffo.Worker
             var entry = OutputFile.CreateEntry(result.GetFilename());
 
             using (var zipEntryStream = entry.Open())
-            {   
-                result.WriteResults().CopyTo(zipEntryStream);
+            using (var resultStream = result.WriteResults())
+            {
+                resultStream.CopyTo(zipEntryStream);
             }
         }
 

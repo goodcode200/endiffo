@@ -65,23 +65,27 @@ namespace Endiffo.Search
         {
             string argumentStr = "export \"" + key + "\" \"" + exportFile + "\"";
 
-            var process = new Process()
-            {
-                StartInfo = new ProcessStartInfo
+            using
+            (
+                var process = new Process()
                 {
-                    FileName = Constants.REGEDIT_COMMAND,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    Arguments = argumentStr,
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = Constants.REGEDIT_COMMAND,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true,
+                        Arguments = argumentStr,
+                    }
                 }
-            };
+            )
+            {
+                Console.WriteLine("Running command " + Constants.REGEDIT_COMMAND + " " + argumentStr);
 
-            Console.WriteLine("Running command " + Constants.REGEDIT_COMMAND + " " + argumentStr);
-
-            process.Start();
-            process.WaitForExit();
+                process.Start();
+                process.WaitForExit();
+            }
         }
     }
 }
