@@ -39,16 +39,6 @@ namespace Endiffo.Worker
                 Writer.ReceiveResult(i);
             });
 
-            ReturnWhenFinished();
-        }
-
-        /// <summary>
-        /// Tell the writer that no more work is expected and return when all work is done by the Writer.
-        /// </summary>
-        private void ReturnWhenFinished()
-        {
-            Writer.WorkIsExpected = false;
-            Writer.ResultReady.Set();
             Writer.ReturnWhenFinished();
         }
 

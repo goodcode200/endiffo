@@ -32,7 +32,7 @@ namespace Endiffo.Worker
         /// <summary>
         /// Denotes if further work is expected. This should be set to false when no more operations are expected.
         /// </summary>
-        internal bool WorkIsExpected { private get; set; } = true;
+        internal volatile bool WorkIsExpected = true;
 
         /// <summary>
         /// The zip file used for storing results.
@@ -46,6 +46,7 @@ namespace Endiffo.Worker
         /// </summary>
         public void ReturnWhenFinished()
         {
+            WorkIsExpected = false;
             WriteResultThreadFinished.WaitOne();
         }
 
